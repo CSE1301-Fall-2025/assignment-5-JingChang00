@@ -34,8 +34,21 @@ public class ZombieSimulator {
 
 		// TODO: Implement this function 
 		// (you can probably adjust code from Assignment 4)
-
-		
+		int i =0;
+		while(i < areZombies.length)
+		{
+			String judge = in.next();
+		if(judge.equals(ZOMBIE_TOKEN_VALUE))	
+		{
+			areZombies[i] = true;
+		}
+		else{
+			areZombies[i] = false;
+		}
+		positions[i][X]= in.nextDouble();
+		positions[i][Y]= in.nextDouble();
+		i++;
+	}
 	}
 
 	/**
@@ -50,12 +63,21 @@ public class ZombieSimulator {
 	public static void drawEntities(boolean[] areZombies, double[][] positions) {
 		// DONE: Clear the frame
 		StdDraw.clear();
-
-		// TODO: Write the loop that displays all the entities 
-		// (you can probably adjust code from Assignment 4)
-
-		
-
+		int i =0;
+		while(i < areZombies.length)
+		{
+			if(areZombies[i] == true)
+			{
+				StdDraw.setPenColor(ZOMBIE_COLOR);
+				StdDraw.filledCircle(positions[i][X], positions[i][Y], ENTITY_RADIUS);
+			}
+			else
+			{
+				StdDraw.setPenColor(NONZOMBIE_COLOR);
+				StdDraw.filledCircle(positions[i][X], positions[i][Y], ENTITY_RADIUS);
+			}
+			i++;
+		}
 		// DONE: Show everything that was drawn (show the updated frame). This should be
 		// the only "show()" command!
 		StdDraw.show();
@@ -74,9 +96,15 @@ public class ZombieSimulator {
 	 */
 	public static boolean touchingZombie(int index, boolean[] areZombies, double[][] positions) {
 		// TODO: Complete this method
-
-		
-
+		double distance;
+		for(int i = 0; i < areZombies.length; i++)
+		{
+			distance = Math.sqrt(Math.pow((positions[i][X]-positions[index][X]),2)+Math.pow((positions[i][Y]-positions[index][Y]),2));
+				if(distance <= 2*ENTITY_RADIUS && areZombies[i] == true)
+				{
+					return true;
+				}
+			}
 		return false; // FIXME: Replace this so it returns the value of interest
 	}
 
@@ -103,8 +131,32 @@ public class ZombieSimulator {
 	public static void updateEntities(boolean[] areZombies, double[][] positions) {
 		// TODO: Complete this method: It should update the positions of items in the
 		// entities array
-
-		
+		for(int i =0; i < areZombies.length; i++)
+		{
+			positions[i][X] = positions[i][X]+(Math.random()*RANDOM_DELTA_HALF_RANGE*2)-RANDOM_DELTA_HALF_RANGE;
+			positions[i][Y] = positions[i][Y]+(Math.random()*RANDOM_DELTA_HALF_RANGE*2)-RANDOM_DELTA_HALF_RANGE;
+			//positions[i][X]+=
+			if(positions[i][X]<0)
+			{
+				positions[i][X] = 0;
+			}
+			if(positions[i][X]>1)
+			{
+				positions[i][X] = 1;
+			}
+			if(positions[i][Y]<0)
+			{
+				positions[i][Y] = 0;
+			}
+			if(positions[i][Y]>1)
+			{
+				positions[i][Y] = 1;
+			}
+			if (areZombies[i] == false && touchingZombie(i, areZombies, positions))
+			 {
+            areZombies[i] = true;
+		}
+    }	
 	}
 
 	
@@ -115,29 +167,41 @@ public class ZombieSimulator {
 	// TODO: Change TodoReplaceWithCorrectReturnType to appropriate return type.
 	// TODO: Change TodoReplaceWithCorrectParameterType to appropriate parameter type.
 	// TODO: Rename todoRenameMe.
-	// public static TodoReplaceWithCorrectReturnType nonzombieCount(TodoReplaceWithCorrectParameterType todoRenameMe) {
-	//     TODO: complete this method
-	// }
+	
+	public static int nonzombieCount(boolean[] areZombies) 
+	{
+	    int count = 0;
+		for(int i = 0; i < areZombies.length; i++)
+		{
+			
+			if(areZombies[i] == false)
+			{count = count+1;}
+		}
+		return count;
+	 }
 
 	/**
 	 * Run the zombie simulation.
 	 */
 	private static void runSimulation(Scanner in) {
 		StdDraw.enableDoubleBuffering(); // reduce unpleasant drawing artifacts, speed things up
-
-		// TODO: Uncomment and fix the code below.
-		// int N = TODO;
-		// boolean[] areZombies = TODO;
-		// double[][] positions = TODO;
-		// readEntities(ap, areZombies, positions);
-		// drawEntities(areZombies, positions);
+		  int N = in.nextInt();
+		  boolean[] areZombies = new boolean[N];
+		  double[][] positions = new double[N][2];
+		  readEntities(in, areZombies, positions);
+		  drawEntities(areZombies, positions);
 		
 		StdDraw.pause(500);
-
+		while(nonzombieCount(areZombies)>0)
+		{
+			updateEntities(areZombies, positions);
+			drawEntities(areZombies, positions);
+		}
 		// TODO: Write the loop that will run the simulation.
 		// Continue if nonzombies remain
 		// Update zombie state and positions
 		// Redraw
+		
 		
 	}
 
